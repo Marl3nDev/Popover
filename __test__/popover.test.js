@@ -37,21 +37,32 @@ describe('PopoverWidget', () => {
   });
 
   test('правильно позиционирует popover', () => {
-    button.getBoundingClientRect = jest.fn(() => ({
-      top: 100,
-      left: 100,
-      width: 100,
-      height: 40,
-      toJSON: () => {},
-    }));
+    const buttonRect = { top: 100, left: 100, width: 100, height: 40 };
+    const popoverRect = { width: 200, height: 80 };
+    const gap = 10;
 
-    popover.showPopover(button, 'Заголовок', 'Текст', 0);
+    // Мокаем getBoundingClientRect в ПРАВИЛЬНОМ ПОРЯДКЕ
+    // В коде сначала вызывается для popover, потом для button
+    Element.prototype.getBoundingClientRect = jest.fn()
+      .mockReturnValueOnce(popoverRect)  // Первый вызов для popover
+      .mockReturnValueOnce(buttonRect); // Второй вызов для кнопки
+
+    // Вызываем метод ОДИН РАЗ
+    popover.showPopover(button, 'Test', 'Content', 0);
     jest.runAllTimers();
 
+    // Находим реальный popover в DOM
     const popoverElement = document.querySelector('.popover');
+    expect(popoverElement).not.toBeNull();
 
-    expect(popoverElement.style.top).toBeTruthy();
-    expect(popoverElement.style.left).toBeTruthy();
-    expect(popoverElement.style.display).toBe('block');
+    // Проверяем результат
+    const expectedTop = buttonRect.top - popoverRect.height - gap;
+    const expectedLeft = buttonRect.left + buttonRect.width / 2;
+
+    expect(popoverElement.style.top).toBe(`${expectedTop}px`);
+    expect(popoverElement.style.left).toBe(`${expectedLeft}px`);
+
+    // Очищаем мок
+    jest.restoreAllMocks();
   });
 });

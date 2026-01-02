@@ -1,8 +1,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-module.exports = {
-  mode: 'development',
+module.exports = (env, argv) => ({
+  mode: argv.mode === 'production' ? 'production' : 'development',
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -14,7 +14,12 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: 'babel-loader',
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+          },
+        },
       },
       {
         test: /\.css$/i,
@@ -25,6 +30,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/index.html',
+      inject: 'body',
     }),
   ],
   devServer: {
@@ -34,5 +40,8 @@ module.exports = {
     compress: true,
     port: 9000,
     open: true,
+    hot: true,
+    historyApiFallback: true,
   },
-};
+  devtool: 'source-map',
+});
