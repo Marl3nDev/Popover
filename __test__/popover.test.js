@@ -37,14 +37,22 @@ describe('PopoverWidget', () => {
   });
 
   test('правильно позиционирует popover', () => {
-    const buttonRect = { top: 100, left: 100, width: 100, height: 40 };
-    const popoverRect = { width: 200, height: 80 };
+    const buttonRect = {
+      top: 100,
+      left: 100,
+      width: 100,
+      height: 40,
+    };
+    const popoverRect = {
+      width: 200,
+      height: 80,
+    };
     const gap = 10;
 
     // Мокаем getBoundingClientRect в ПРАВИЛЬНОМ ПОРЯДКЕ
     // В коде сначала вызывается для popover, потом для button
     Element.prototype.getBoundingClientRect = jest.fn()
-      .mockReturnValueOnce(popoverRect)  // Первый вызов для popover
+      .mockReturnValueOnce(popoverRect) // Первый вызов для popover
       .mockReturnValueOnce(buttonRect); // Второй вызов для кнопки
 
     // Вызываем метод ОДИН РАЗ
